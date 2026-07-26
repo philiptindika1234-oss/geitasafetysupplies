@@ -2041,10 +2041,10 @@ document.getElementById('saveRealEmailBtn').addEventListener('click', async () =
     const user = auth.currentUser;
     const cred = firebase.auth.EmailAuthProvider.credential(user.email, curPw);
     await user.reauthenticateWithCredential(cred);
-    await user.updateEmail(realEmail);
+    await user.verifyBeforeUpdateEmail(realEmail);
     statusBox.style.color = 'var(--green)';
-    statusBox.textContent = `Email halisi imehifadhiwa: ${realEmail}. MUHIMU: mwambie msaidizi wako (Claude) atumie email hii mpya kwenye code ili "Ingia" iendelee kufanya kazi mara ijayo!`;
-    await logAudit('Sasisha Email Halisi ya Mmiliki', realEmail);
+    statusBox.textContent = `Barua pepe ya uthibitisho imetumwa kwenye ${realEmail}. Fungua inbox yako (na "Spam" kama hujaiona), bofya kiungo cha uthibitisho kilichomo. Baada ya kubofya hicho kiungo, email itabadilika kikamilifu — ndipo mwambie msaidizi wako (Claude) atumie email hii mpya kwenye code ili "Ingia" iendelee kufanya kazi.`;
+    await logAudit('Omba Uthibitisho wa Email Halisi ya Mmiliki', realEmail);
   }catch(err){
     if(err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential'){ statusBox.textContent = 'Password ya sasa si sahihi.'; }
     else if(err.code === 'auth/email-already-in-use'){ statusBox.textContent = 'Email hii tayari inatumika kwenye akaunti nyingine.'; }
