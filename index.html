@@ -545,13 +545,13 @@ async function sendSecurityAlertTelegram(details){
 
 /* Secondary Firebase app: inatumika na Mmiliki kutengeneza akaunti za wafanyakazi
    bila yeye mwenyewe kutolewa nje ya session yake ya sasa. */
+const firebaseConfigured = !String(firebaseConfig.apiKey).startsWith('PASTE_');
 const secondaryApp = firebaseConfigured ? firebase.initializeApp(firebaseConfig, 'Secondary') : null;
 const secondaryAuth = secondaryApp ? secondaryApp.auth() : null;
 </script>
 
 <script>
 /* ---------------- storage wrapper: Firestore (shared across devices) with localStorage fallback ---------------- */
-const firebaseConfigured = !String(firebaseConfig.apiKey).startsWith('PASTE_');
 
 const storage = firebaseConfigured ? {
   async get(key){
