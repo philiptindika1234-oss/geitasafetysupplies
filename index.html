@@ -652,7 +652,7 @@ async function logAudit(action, details){
 
 /* ---------------- LOGIN (Firebase Authentication) ---------------- */
 let loginRole = 'owner';
-const AUTH_EMAILS = { owner:'philiptindika1234@gmail.com', , staff: 'philiptindika@gmail.com'  };
+const AUTH_EMAILS = { owner:'philiptindika1234@gmail.com', staff: 'philiptindika@gmail.com'  };
 document.getElementById('roleOwnerBtn').addEventListener('click', () => {
   loginRole='owner';
   document.getElementById('roleOwnerBtn').classList.add('active'); document.getElementById('roleStaffBtn').classList.remove('active');
