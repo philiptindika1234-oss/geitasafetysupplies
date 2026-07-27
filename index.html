@@ -720,7 +720,9 @@ document.getElementById('loginBtn').addEventListener('click', async () => {
     }
   }
 
-  const staffRec = staffAccounts.find(s => s.uid === cred.user.uid && s.active !== false);
+  const staffRec = staffAccounts.find(
+    s => s.uid === cred.user.uid && s.active !== false
+  );
       if(!staffRec){
         await auth.signOut();
         errBox.textContent = 'Akaunti hii si mfanyakazi halali (huenda imeondolewa). Wasiliana na Mmiliki.';
