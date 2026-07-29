@@ -553,16 +553,27 @@ const secondaryAuth = secondaryApp ? secondaryApp.auth() : null;
 <script>
 /* ---------------- storage wrapper: Firestore (shared across devices) with localStorage fallback ---------------- */
 
-const storage = firebaseConfigured ? {
+const storage = {
+
   async get(key){
     try{
       const doc = await db.collection(FIRESTORE_COLLECTION).doc(key).get();
-      return doc.exists ? { key, value: doc.data().value } : null;
+
+      if(doc.exists){
+        return {
+          key,
+          value: doc.data().value
+        };
+      }
+
+      return null;
+
     }catch(e){
       console.error('Firestore get error:', e);
       return null;
     }
   },
+
 
   async set(key, value){
     try{
@@ -570,28 +581,11 @@ const storage = firebaseConfigured ? {
         value,
         updatedAt: Date.now()
       });
+
       return { key, value };
+
     }catch(e){
       console.error('Firestore set error:', e);
-      return null;
-    }
-  }
-
-} : {
-  async get(key){
-    try{
-      const v = localStorage.getItem(key);
-      return v !== null ? { key, value: v } : null;
-    }catch(e){
-      return null;
-    }
-  },
-
-  async set(key, value){
-    try{
-      localStorage.setItem(key, value);
-      return { key, value };
-    }catch(e){
       return null;
     }
   }
