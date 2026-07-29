@@ -903,12 +903,13 @@ async function loadAll(){
   try{
     const r = await storage.get(K_ITEMS);
 
-    if (r && r.value) {
-      items = JSON.parse(r.value);
-    } else {
-      console.warn("Hakuna stock items zilizopatikana Firestore. Haitengenezi SEED.");
-      items = [];
-    }
+if (r && r.value) {
+  items = JSON.parse(r.value);
+  console.log("ITEMS ZILIZOPAKIWA:", items.length);
+} else {
+  console.warn("Hakuna stock items");
+  items = [];
+}
   } catch(e) {
     console.error('Imeshindwa kuungana na Firestore:', e);
     alert('Tatizo la muunganiko. Bidhaa hazikupakiwa. USIONGEZE/USIBADILISHE chochote sasa.');
