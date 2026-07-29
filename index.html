@@ -560,12 +560,10 @@ const storage = firebaseConfigured ? {
       return doc.exists ? {key, value: doc.data().value} : null;
     }catch(e){ console.error('Firestore get error:', e); return null; }
   },
-  async set(key, value){
-    try{
-      await db.collection(FIRESTORE_COLLECTION).doc(key).set({value, updatedAt: Date.now()});
-      return {key, value};
-    }catch(e){ console.error('Firestore set error:', e); return null; }
-  }
+ async get(key){
+    const doc = await db.collection(FIRESTORE_COLLECTION).doc(key).get();
+    return doc.exists ? {key, value: doc.data().value} : null;
+  },
 } : {
   async get(key){ try{ const v = localStorage.getItem(key); return v !== null ? {key, value: v} : null; }catch(e){ return null; } },
   async set(key, value){ try{ localStorage.setItem(key, value); return {key, value}; }catch(e){ return null; } }
@@ -875,7 +873,19 @@ function applyRoleUI(){
 
 /* ---------------- LOAD/SAVE ---------------- */
 async function loadAll(){
-  try{ const r = await storage.get(K_ITEMS); items = r && r.value ? JSON.parse(r.value) : SEED.map(s => ({...s, id: uid('itm')})); if(!r||!r.value) await saveItems(); }catch(e){ items = SEED.map(s => ({...s, id: uid('itm')})); }
+  try{
+    const r = await storage.get(K_ITEMS);
+    if (r && r.value) {
+      items = JSON.parse(r.value);
+    } else {
+      items = SEED.map(s => ({...s, id: uid('itm')}));
+      await saveItems();
+    }
+  } catch(e) {
+    console.error('Imeshindwa kuungana na Firestore:', e);
+    alert('Tatizo la muunganiko. Bidhaa hazikupakiwa. USIONGEZE/USIBADILISHE chochote sasa.');
+    items = [];
+  }
   try{ const r = await storage.get(K_SALES); sales = r && r.value ? JSON.parse(r.value) : []; }catch(e){ sales = []; }
   try{ const r = await storage.get(K_EXP); expenses = r && r.value ? JSON.parse(r.value) : []; }catch(e){ expenses = []; }
   try{ const r = await storage.get(K_PUR); purchases = r && r.value ? JSON.parse(r.value) : []; }catch(e){ purchases = []; }
