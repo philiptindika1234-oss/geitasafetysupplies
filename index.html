@@ -913,11 +913,6 @@ async function loadAll(){
     alert('Tatizo la muunganiko. Bidhaa hazikupakiwa. USIONGEZE/USIBADILISHE chochote sasa.');
     items = [];
   }
-  } catch(e) {
-    console.error('Imeshindwa kuungana na Firestore:', e);
-    alert('Tatizo la muunganiko. Bidhaa hazikupakiwa. USIONGEZE/USIBADILISHE chochote sasa.');
-    items = [];
-  }
   try{ const r = await storage.get(K_SALES); sales = r && r.value ? JSON.parse(r.value) : []; }catch(e){ sales = []; }
   try{ const r = await storage.get(K_EXP); expenses = r && r.value ? JSON.parse(r.value) : []; }catch(e){ expenses = []; }
   try{ const r = await storage.get(K_PUR); purchases = r && r.value ? JSON.parse(r.value) : []; }catch(e){ purchases = []; }
