@@ -902,11 +902,12 @@ function applyRoleUI(){
 async function loadAll(){
   try{
     const r = await storage.get(K_ITEMS);
+
     if (r && r.value) {
       items = JSON.parse(r.value);
     } else {
-      items = SEED.map(s => ({...s, id: uid('itm')}));
-      await saveItems();
+      console.warn("Hakuna stock items zilizopatikana Firestore. Haitengenezi SEED.");
+      items = [];
     }
   } catch(e) {
     console.error('Imeshindwa kuungana na Firestore:', e);
