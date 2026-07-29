@@ -559,7 +559,6 @@ const storage = firebaseConfigured ? {
       const doc = await db.collection(FIRESTORE_COLLECTION).doc(key).get();
       return doc.exists ? {key, value: doc.data().value} : null;
     }catch(e){ console.error('Firestore get error:', e); return null; }
-  },
  async get(key){
     const doc = await db.collection(FIRESTORE_COLLECTION).doc(key).get();
     return doc.exists ? {key, value: doc.data().value} : null;
