@@ -956,14 +956,23 @@ async function saveBranches(){ const m=document.getElementById('statusMsg'); try
 async function saveStaff(){ const m=document.getElementById('statusMsg'); try{ const r=await storage.set(K_STAFF, JSON.stringify(staffAccounts)); m.textContent = r?'':'Imeshindwa kuhifadhi wafanyakazi.'; }catch(e){ m.textContent='Hitilafu ya kuhifadhi wafanyakazi.'; } }
 function currentBranch(){ return branches.find(b => b.id === activeBranchId) || branches[0]; }
 
-async function saveItems(){ const m=document.getElementById('statusMsg'); try{ const r=await storage.set(K_ITEMS, JSON.stringify(items)); m.textContent = r?'':'Imeshindwa kuhifadhi bidhaa.'; }catch(e){ m.textContent='Hitilafu ya kuhifadhi bidhaa.'; } }
-async function saveSales(){ const m=document.getElementById('statusMsg'); try{ const r=await storage.set(K_SALES, JSON.stringify(sales)); m.textContent = r?'':'Imeshindwa kuhifadhi mauzo.'; }catch(e){ m.textContent='Hitilafu ya kuhifadhi mauzo.'; } }
-async function saveExpenses(){ const m=document.getElementById('statusMsg'); try{ const r=await storage.set(K_EXP, JSON.stringify(expenses)); m.textContent = r?'':'Imeshindwa kuhifadhi matumizi.'; }catch(e){ m.textContent='Hitilafu ya kuhifadhi matumizi.'; } }
-async function savePurchases(){ const m=document.getElementById('statusMsg'); try{ const r=await storage.set(K_PUR, JSON.stringify(purchases)); m.textContent = r?'':'Imeshindwa kuhifadhi manunuzi.'; }catch(e){ m.textContent='Hitilafu ya kuhifadhi manunuzi.'; } }
-async function saveSettings(){ const m=document.getElementById('statusMsg'); try{ const r=await storage.set(K_SETTINGS, JSON.stringify(settings)); m.textContent = r?'':'Imeshindwa kuhifadhi mipangilio.'; }catch(e){ m.textContent='Hitilafu ya kuhifadhi mipangilio.'; } }
-async function saveSuppliers(){ const m=document.getElementById('statusMsg'); try{ const r=await storage.set(K_SUPPLIERS, JSON.stringify(suppliers)); m.textContent = r?'':'Imeshindwa kuhifadhi wasambazaji.'; }catch(e){ m.textContent='Hitilafu ya kuhifadhi wasambazaji.'; } }
-async function saveCustomers(){ const m=document.getElementById('statusMsg'); try{ const r=await storage.set(K_CUSTOMERS, JSON.stringify(customers)); m.textContent = r?'':'Imeshindwa kuhifadhi wateja.'; }catch(e){ m.textContent='Hitilafu ya kuhifadhi wateja.'; } }
+async function saveItems(){
+  const m=document.getElementById('statusMsg');
 
+  try{
+
+    console.log("SAVE ITEMS COUNT:", items.length);
+    console.log("SAVE ITEMS DATA:", items);
+
+    const r = await storage.set(K_ITEMS, JSON.stringify(items));
+
+    m.textContent = r ? '' : 'Imeshindwa kuhifadhi bidhaa.';
+
+  }catch(e){
+    console.error(e);
+    m.textContent='Hitilafu ya kuhifadhi bidhaa.';
+  }
+}
 /* ---------------- NAV ---------------- */
 document.querySelectorAll('.navtab').forEach(t => {
   t.addEventListener('click', () => {
