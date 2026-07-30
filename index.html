@@ -1178,19 +1178,40 @@ function renderPurchases(mode){
     body.innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--text-dim);padding:24px;font-family:'IBM Plex Mono',monospace;font-size:12px;">Hakuna manunuzi yaliyorekodiwa.</td></tr>`;
     return;
   }
-  body.innerHTML = list.map(p => `<tr>
-    <td>${p.date}</td><td>${escapeHtml(p.itemName)}</td><td>${p.qty} ${escapeHtml(p.unit||'')}</td>
-    <td>${money(p.unitCost)}</td><td>${money(p.total)}</td><td>${p.supplier ? escapeHtml(p.supplier) : '—'}</td>
-    <td><button class="btn btn-sm btn-danger" data-delpur="${p.id}">Ondoa</button></td>
+ function openEditPurchaseModal `<tr>
+    <td>${p.date}</td>
+    <td>${escapeHtml(p.itemName)}</td>
+    <td>${p.qty} ${escapeHtml(p.unit||'')}</td>
+    <td>${money(p.unitCost)}</td>
+    <td>${money(p.total)}</td>
+    <td>${p.supplier ? escapeHtml(p.supplier) : '—'}</td>
+    <td>
+      ${isOwner() ? `
+      <button class="btn btn-sm" data-editpur="${p.id}">Hariri</button>
+      <button class="btn btn-sm btn-danger" data-delpur="${p.id}">Ondoa</button>
+      ` : ''}
+    </td>
   </tr>`).join('');
-  body.querySelectorAll('[data-delpur]').forEach(b => b.addEventListener('click', async () => {
-    const p = purchases.find(x=>x.id===b.dataset.delpur);
-    purchases = purchases.filter(p => p.id !== b.dataset.delpur);
-    await savePurchases(); renderPurchases(purDateMode); renderRipoti();
-    if(p) await logAudit('Futa Ununuzi', `${p.itemName} x${p.qty}`);
-  }));
-}
 
+body.querySelectorAll('[data-editpur]').forEach(b => 
+  b.addEventListener('click', () => openEditPurchaseModal(b.dataset.editpur))
+);
+
+body.querySelectorAll('[data-delpur]').forEach(b => b.addEventListener('click', async () => {
+    const p = purchases.find(x => x.id === b.dataset.delpur);
+    if(!p) return;
+
+    if(!confirm(`Una uhakika unataka kufuta ununuzi wa ${p.itemName} x${p.qty}?`)) return;
+
+    purchases = purchases.filter(x => x.id !== b.dataset.delpur);
+
+    await savePurchases();
+    renderPurchases(purDateMode);
+    renderRipoti();
+
+    await logAudit('Futa Ununuzi', `${p.itemName} x${p.qty}`);
+}));
+}
 function itemLabel(i){ return i.name + (i.variant ? ' — ' + i.variant : '') + ' — SKU:' + i.sku + ' (' + i.quantity + ' ' + i.unit + ' zipo)'; }
 
 let lastPurchaseDate = todayStr();
