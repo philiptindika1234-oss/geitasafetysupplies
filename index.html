@@ -1233,6 +1233,146 @@ body.querySelectorAll('[data-delpur]').forEach(b => {
     `${p.itemName} x${p.qty}`
   );
 }
+async function deletePurchase(id){
+  if(!isOwner()) return;
+
+  const p = purchases.find(x => x.id === id);
+  if(!p) return;
+
+  if(!confirm(`Una uhakika unataka kufuta ununuzi wa ${p.itemName} x${p.qty}?\n\nStoo itarekebishwa.`)){
+    return;
+  }
+
+  // rudisha stock
+  const item = items.find(i => i.id === p.itemId);
+  if(item){
+    item.quantity = Math.max(0, item.quantity - p.qty);
+    await saveItems();
+  }
+
+  purchases = purchases.filter(x => x.id !== id);
+
+  await savePurchases();
+
+  renderPurchases(purDateMode);
+  renderBidhaa();
+  renderRipoti();
+
+  await logAudit(
+    'Futa Ununuzi',
+    `${p.itemName} x${p.qty}`
+  );
+}
+
+
+function openEditPurchaseModal(id){
+
+  if(!isOwner()) return;
+
+  const p = purchases.find(x => x.id === id);
+  if(!p) return;
+
+
+  const root = document.getElementById('modalRoot');
+
+  root.innerHTML = `
+  <div class="modal-backdrop" id="backdrop">
+    <div class="modal">
+
+      <h2>Hariri Ununuzi</h2>
+
+      <div class="field">
+        <label>Bidhaa</label>
+        <input id="ep-item" value="${escapeHtml(p.itemName)}" disabled>
+      </div>
+
+
+      <div class="field">
+        <label>Kiasi</label>
+        <input type="number" id="ep-qty" value="${p.qty}">
+      </div>
+
+
+      <div class="field">
+        <label>Bei ya Ununuzi</label>
+        <input type="number" id="ep-cost" value="${p.unitCost}">
+      </div>
+
+
+      <div class="field">
+        <label>Tarehe</label>
+        <input type="date" id="ep-date" value="${p.date}">
+      </div>
+
+
+      <div class="field">
+        <label>Supplier</label>
+        <input id="ep-supplier" value="${escapeHtml(p.supplier || '')}">
+      </div>
+
+
+      <div class="modal-actions">
+
+        <button class="btn" id="cancelBtn">
+          Ghairi
+        </button>
+
+        <button class="btn btn-primary" id="saveEditPurBtn">
+          Hifadhi
+        </button>
+
+      </div>
+
+
+    </div>
+  </div>
+  `;
+
+
+document.getElementById('cancelBtn')
+.addEventListener('click', closeModal);
+
+
+
+document.getElementById('saveEditPurBtn')
+.addEventListener('click', async()=>{
+
+
+const oldQty = p.qty;
+
+
+const newQty =
+parseInt(document.getElementById('ep-qty').value)||0;
+
+
+const newCost =
+parseFloat(document.getElementById('ep-cost').value)||0;
+
+
+p.qty = newQty;
+p.unitCost = newCost;
+p.total = newQty * newCost;
+p.date = document.getElementById('ep-date').value;
+p.supplier =
+document.getElementById('ep-supplier').value;
+
+
+await savePurchases();
+
+
+renderPurchases(purDateMode);
+renderRipoti();
+
+
+closeModal();
+
+
+await logAudit(
+'Hariri Ununuzi',
+`${p.itemName} imebadilishwa`
+);
+});
+}  
 function itemLabel(i){ return i.name + (i.variant ? ' — ' + i.variant : '') + ' — SKU:' + i.sku + ' (' + i.quantity + ' ' + i.unit + ' zipo)'; }
 
 let lastPurchaseDate = todayStr();
