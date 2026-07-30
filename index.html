@@ -1193,24 +1193,45 @@ function renderPurchases(mode){
     </td>
   </tr>`).join('');
 
-body.querySelectorAll('[data-editpur]').forEach(b => 
-  b.addEventListener('click', () => openEditPurchaseModal(b.dataset.editpur))
-);
+body.querySelectorAll('[data-editpur]').forEach(b => {
+  b.addEventListener('click', () => {
+    openEditPurchaseModal(b.dataset.editpur);
+  });
+});
+body.querySelectorAll('[data-delpur]').forEach(b => {
+  b.addEventListener('click', () => {
+    deletePurchase(b.dataset.delpur);
+  });
+});
+}
+  async function deletePurchase(id){
 
-body.querySelectorAll('[data-delpur]').forEach(b => b.addEventListener('click', async () => {
-    const p = purchases.find(x => x.id === b.dataset.delpur);
-    if(!p) return;
+  const p = purchases.find(x => x.id === id);
+  if(!p) return;
 
-    if(!confirm(`Una uhakika unataka kufuta ununuzi wa ${p.itemName} x${p.qty}?`)) return;
+  if(!confirm(`Una uhakika unataka kufuta ununuzi wa ${p.itemName} x${p.qty}?`)){
+    return;
+  }
 
-    purchases = purchases.filter(x => x.id !== b.dataset.delpur);
+  const it = items.find(i => i.id === p.itemId);
 
-    await savePurchases();
-    renderPurchases(purDateMode);
-    renderRipoti();
+  if(it){
+    it.quantity -= p.qty;
+  }
 
-    await logAudit('Futa Ununuzi', `${p.itemName} x${p.qty}`);
-}));
+  purchases = purchases.filter(x => x.id !== id);
+
+  await savePurchases();
+  await saveItems();
+
+  renderPurchases(purDateMode);
+  renderBidhaa();
+  renderRipoti();
+
+  await logAudit(
+    'Futa Ununuzi',
+    `${p.itemName} x${p.qty}`
+  );
 }
 function itemLabel(i){ return i.name + (i.variant ? ' — ' + i.variant : '') + ' — SKU:' + i.sku + ' (' + i.quantity + ' ' + i.unit + ' zipo)'; }
 
