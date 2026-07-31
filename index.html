@@ -1314,10 +1314,14 @@ await logAudit(
 `${p.itemName} imebadilishwa`
 );
 });
-function itemLabel(i){ return i.name + (i.variant ? ' — ' + i.variant : '') + ' — SKU:' + i.sku + ' (' + i.quantity + ' ' + i.unit + ' zipo)'; }
-
 let lastPurchaseDate = todayStr();
 let lastSaleDate = todayStr();
+
+function itemLabel(i){
+  return i.name + (i.variant ? ' — ' + i.variant : '') + 
+  ' — SKU:' + i.sku + ' (' + i.quantity + ' ' + i.unit + ' zipo)';
+}
+
 
 function openPurchaseModal(){
   const root = document.getElementById('modalRoot');
