@@ -1169,39 +1169,29 @@ document.getElementById('purTodayBtn').addEventListener('click', () => { purDate
 document.getElementById('purAllBtn').addEventListener('click', () => { purDateMode='all'; renderPurchases('all'); });
 document.getElementById('purDateFilter').addEventListener('change', () => { purDateMode='date'; renderPurchases('date'); });
 
-function renderPurchases(mode){
-  const dateVal = document.getElementById('purDateFilter').value || todayStr();
-  let list = purchases.filter(inActiveBranch).sort((a,b)=> b.date.localeCompare(a.date) || b.createdAt - a.createdAt);
-  if(mode === 'today' || mode === 'date') list = list.filter(p => p.date === dateVal);
-  const body = document.getElementById('purBody');
-  if(list.length === 0){
-    body.innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--text-dim);padding:24px;font-family:'IBM Plex Mono',monospace;font-size:12px;">Hakuna manunuzi yaliyorekodiwa.</td></tr>`;
-    return;
-  }
-  `<tr>
-    <td>${p.date}</td>
-    <td>${escapeHtml(p.itemName)}</td>
-    <td>${p.qty} ${escapeHtml(p.unit||'')}</td>
-    <td>${money(p.unitCost)}</td>
-    <td>${money(p.total)}</td>
-    <td>${p.supplier ? escapeHtml(p.supplier) : '—'}</td>
-    <td>
-      ${isOwner() ? `
+body.innerHTML = list.map(p => `
+<tr>
+  <td>${p.date}</td>
+  <td>${escapeHtml(p.itemName)}</td>
+  <td>${p.qty} ${escapeHtml(p.unit || '')}</td>
+  <td>${money(p.unitCost)}</td>
+  <td>${money(p.total)}</td>
+  <td>${p.supplier ? escapeHtml(p.supplier) : '—'}</td>
+  <td>
+    ${isOwner() ? `
       <button class="btn btn-sm" data-editpur="${p.id}">Hariri</button>
       <button class="btn btn-sm btn-danger" data-delpur="${p.id}">Ondoa</button>
-      ` : ''}
-    </td>
-  </tr>`).join('');
+    ` : ''}
+  </td>
+</tr>
+`).join('');
 
 body.querySelectorAll('[data-editpur]').forEach(b => {
-  b.addEventListener('click', () => {
-    openEditPurchaseModal(b.dataset.editpur);
-  });
+  b.addEventListener('click', () => openEditPurchaseModal(b.dataset.editpur));
 });
+
 body.querySelectorAll('[data-delpur]').forEach(b => {
-  b.addEventListener('click', () => {
-    deletePurchase(b.dataset.delpur);
-  });
+  b.addEventListener('click', () => deletePurchase(b.dataset.delpur));
 });
 }
   async function deletePurchase(id){
