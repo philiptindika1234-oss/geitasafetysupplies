@@ -1163,13 +1163,41 @@ document.getElementById('searchInput').addEventListener('input', renderBidhaa);
 document.getElementById('statusFilter').addEventListener('change', renderBidhaa);
 
 /* ---------------- MANUNUZI ---------------- */
-let purDateMode = 'today';
-document.getElementById('newPurchaseBtn').addEventListener('click', openPurchaseModal);
-document.getElementById('purTodayBtn').addEventListener('click', () => { purDateMode='today'; document.getElementById('purDateFilter').value = todayStr(); renderPurchases('today'); });
-document.getElementById('purAllBtn').addEventListener('click', () => { purDateMode='all'; renderPurchases('all'); });
-document.getElementById('purDateFilter').addEventListener('change', () => { purDateMode='date'; renderPurchases('date'); });
 
-body.innerHTML = list.map(p => `
+let purDateMode = 'today';
+
+document.getElementById('newPurchaseBtn').addEventListener('click', openPurchaseModal);
+
+document.getElementById('purTodayBtn').addEventListener('click', () => {
+  purDateMode = 'today';
+  document.getElementById('purDateFilter').value = todayStr();
+  renderPurchases('today');
+});
+
+document.getElementById('purAllBtn').addEventListener('click', () => {
+  purDateMode = 'all';
+  renderPurchases('all');
+});
+
+document.getElementById('purDateFilter').addEventListener('change', () => {
+  purDateMode = 'date';
+  renderPurchases('date');
+});
+
+
+function renderPurchases(mode){
+
+  const body = document.getElementById('purchasesTableBody');
+
+  if(!body) return;
+
+  let list = purchases;
+
+  if(mode === 'today'){
+    list = purchases.filter(p => p.date === todayStr());
+  }
+
+  body.innerHTML = list.map(p => `
 <tr>
   <td>${p.date}</td>
   <td>${escapeHtml(p.itemName)}</td>
@@ -1185,109 +1213,63 @@ body.innerHTML = list.map(p => `
   </td>
 </tr>
 `).join('');
-body.querySelectorAll('[data-editpur]').forEach(b => {
-  b.addEventListener('click', () => openEditPurchaseModal(b.dataset.editpur));
-});
 
-body.querySelectorAll('[data-delpur]').forEach(b => {
-  b.addEventListener('click', () => deletePurchase(b.dataset.delpur));
-});
+
+  body.querySelectorAll('[data-editpur]').forEach(b => {
+    b.addEventListener('click', () => {
+      openEditPurchaseModal(b.dataset.editpur);
+    });
+  });
+
+
+  body.querySelectorAll('[data-delpur]').forEach(b => {
+    b.addEventListener('click', () => {
+      deletePurchase(b.dataset.delpur);
+    });
+  });
+
+}
+
+
 
 async function deletePurchase(id){
+
   if(!isOwner()) return;
 
   const p = purchases.find(x => x.id === id);
+
   if(!p) return;
+
 
   if(!confirm(`Una uhakika unataka kufuta ununuzi wa ${p.itemName} x${p.qty}?\n\nStoo itarekebishwa.`)){
     return;
   }
 
-  // Rudisha stock
+
   const item = items.find(i => i.id === p.itemId);
+
   if(item){
     item.quantity = Math.max(0, item.quantity - p.qty);
     await saveItems();
   }
 
-  // Futa ununuzi
+
   purchases = purchases.filter(x => x.id !== id);
 
   await savePurchases();
 
-  // Refresh UI
+
   renderPurchases(purDateMode);
   renderBidhaa();
   renderRipoti();
 
-  // Audit log
+
   await logAudit(
     'Futa Ununuzi',
     `${p.itemName} x${p.qty}`
   );
+
 }
-
-function openEditPurchaseModal(id){
-
-  if(!isOwner()) return;
-
-  const p = purchases.find(x => x.id === id);
-  if(!p) return;
-
-  const root = document.getElementById('modalRoot');
-  root.innerHTML = `
-  <div class="modal-backdrop" id="backdrop">
-    <div class="modal">
-
-      <h2>Hariri Ununuzi</h2>
-
-      <div class="field">
-        <label>Bidhaa</label>
-        <input id="ep-item" value="${escapeHtml(p.itemName)}" disabled>
-      </div>
-
-
-      <div class="field">
-        <label>Kiasi</label>
-        <input type="number" id="ep-qty" value="${p.qty}">
-      </div>
-
-
-      <div class="field">
-        <label>Bei ya Ununuzi</label>
-        <input type="number" id="ep-cost" value="${p.unitCost}">
-      </div>
-
-
-      <div class="field">
-        <label>Tarehe</label>
-        <input type="date" id="ep-date" value="${p.date}">
-      </div>
-
-
-      <div class="field">
-        <label>Supplier</label>
-        <input id="ep-supplier" value="${escapeHtml(p.supplier || '')}">
-      </div>
-
-
-      <div class="modal-actions">
-
-        <button class="btn" id="cancelBtn">
-          Ghairi
-        </button>
-
-        <button class="btn btn-primary" id="saveEditPurBtn">
-          Hifadhi
-        </button>
-
-      </div>
-
-
-    </div>
-  </div>
-  `;
-
 
 document.getElementById('cancelBtn')
 .addEventListener('click', closeModal);
