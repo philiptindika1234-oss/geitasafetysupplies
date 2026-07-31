@@ -1193,7 +1193,6 @@ body.querySelectorAll('[data-editpur]').forEach(b => {
 body.querySelectorAll('[data-delpur]').forEach(b => {
   b.addEventListener('click', () => deletePurchase(b.dataset.delpur));
 });
-}
   async function deletePurchase(id){
 
   const p = purchases.find(x => x.id === id);
