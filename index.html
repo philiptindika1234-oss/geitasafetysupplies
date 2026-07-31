@@ -1185,7 +1185,6 @@ body.innerHTML = list.map(p => `
   </td>
 </tr>
 `).join('');
-
 body.querySelectorAll('[data-editpur]').forEach(b => {
   b.addEventListener('click', () => openEditPurchaseModal(b.dataset.editpur));
 });
@@ -1193,35 +1192,7 @@ body.querySelectorAll('[data-editpur]').forEach(b => {
 body.querySelectorAll('[data-delpur]').forEach(b => {
   b.addEventListener('click', () => deletePurchase(b.dataset.delpur));
 });
-  async function deletePurchase(id){
 
-  const p = purchases.find(x => x.id === id);
-  if(!p) return;
-
-  if(!confirm(`Una uhakika unataka kufuta ununuzi wa ${p.itemName} x${p.qty}?`)){
-    return;
-  }
-
-  const it = items.find(i => i.id === p.itemId);
-
-  if(it){
-    it.quantity -= p.qty;
-  }
-
-  purchases = purchases.filter(x => x.id !== id);
-
-  await savePurchases();
-  await saveItems();
-
-  renderPurchases(purDateMode);
-  renderBidhaa();
-  renderRipoti();
-
-  await logAudit(
-    'Futa Ununuzi',
-    `${p.itemName} x${p.qty}`
-  );
-}
 async function deletePurchase(id){
   if(!isOwner()) return;
 
@@ -1232,27 +1203,29 @@ async function deletePurchase(id){
     return;
   }
 
-  // rudisha stock
+  // Rudisha stock
   const item = items.find(i => i.id === p.itemId);
   if(item){
     item.quantity = Math.max(0, item.quantity - p.qty);
     await saveItems();
   }
 
+  // Futa ununuzi
   purchases = purchases.filter(x => x.id !== id);
 
   await savePurchases();
 
+  // Refresh UI
   renderPurchases(purDateMode);
   renderBidhaa();
   renderRipoti();
 
+  // Audit log
   await logAudit(
     'Futa Ununuzi',
     `${p.itemName} x${p.qty}`
   );
 }
-
 
 function openEditPurchaseModal(id){
 
@@ -1261,9 +1234,7 @@ function openEditPurchaseModal(id){
   const p = purchases.find(x => x.id === id);
   if(!p) return;
 
-
   const root = document.getElementById('modalRoot');
-
   root.innerHTML = `
   <div class="modal-backdrop" id="backdrop">
     <div class="modal">
